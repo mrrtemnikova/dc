@@ -189,8 +189,18 @@ public async Task HandleResponseAsync()
         }
 
 ```
-
+Виды блоков
 ```C# 
+   private readonly Block[] blocks = new Block[]
+        {
+            new IBlock(),
+            new JBLock(),
+            new LBlock(),
+            new OBlock(),
+            new SBlock(),
+            new TBlock(),
+            new ZBlock()
+        };
 
 ```
 
