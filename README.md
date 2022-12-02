@@ -113,6 +113,19 @@ CurrentBlock.BlockID = GetRandomBlock
 
 Сервер устанавливает текущему блоку в поле **BlockID** значение ID случайного блока из списка существующих и передает это клиенту
 
+### :pushpin:Виды блоков
+```C# 
+   
+            IBlock (id=1),
+            JBLock (id=2),
+            LBlock (id=3),
+            OBlock (id=4),
+            SBlock (id=5),
+            TBlock (id=6),
+            ZBlock (id=7)
+       
+```
+
 ### :pushpin:Запрос GetGrid
 
 **На вход из запроса сервер получает параметры поля (int rows, int cols)**.
@@ -150,20 +163,3 @@ rotationState = (rotationState + 1) % BlockTiles.Length;
 **(int row, int column, int blockPosId)**
 
 
-### :pushpin:Виды блоков
-```C# 
-   
-            IBlock (id=1),
-            JBLock (id=2),
-            LBlock (id=3),
-            OBlock (id=4),
-            SBlock (id=5),
-            TBlock (id=6),
-            ZBlock (id=7)
-       
-
-```
-
-```C# 
-
-```
