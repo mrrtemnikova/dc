@@ -137,7 +137,7 @@ new Position(StartOffset.Row, StartOffset.Column)
 
 ```
 
-**Возвращает позицию блока относительно ряда и колонны (int row, int column, int blockPosId)
+**Возвращает позицию блока относительно ряда и колонны (int row, int column, int blockPosId)**
 
 ### :pushpin:Запрос Rotate
 
