@@ -1,5 +1,5 @@
 # dc
- Запуск сервера и ожидание клиента.
+### :pushpin:Запуск сервера и ожидание клиента.
         
 ```C# 
         public void startServer()
@@ -51,7 +51,24 @@ public async Task ConnectNewClient()
         }
 
 ```
-Для начала игры сервер должен получить сообщение от клиента "Want to play" и отправить в ответ "Come and play".
+### :pushpin:Начало игры
+Сервер получает запрос клиента **“StartGame + fieldSize”**
+(Сервер получает запрос клиента на начало игры и указывает, какое по размерам поле использовать: маленькое (20*10), среднее (20*15) или большое (20*20). 
+
+SMALL,(20, 10)
+MEDIUM(20, 15)
+LARGE(20, 20)
+
+Получив информацию, сервер устанавливает размеры поля в зависимости от запроса клиента. 
+
+**тип данных (int rows, int cols)**
+
+**На выход: GameStarted - Rows - Columns (размер поля)**
+
+После установки размеров поля сервер отправляет клиенту сообщение о том, что игра началась, а также количество строк и колонок поля)
+Сервер устанавливает  и отправляет клиенту размер поля, начальный блок, позицию текущего блока
+
+.
 ```C# 
 private async Task ReceiveRequest()
         {
@@ -72,7 +89,7 @@ private async Task ReceiveRequest()
         }
 ```
 Если для фигуры на поле не хватает места, т.е. верхний ряд не пуст, она не размещается. Сервер посылает клиенту сообщение
-об окончании игры, выводится сообщение об окончании  await SendResponseAsync("GameOver").
+об окончании игры, выводится сообщение об окончании  **await SendResponseAsync("GameOver")**.
 
 ```C# 
 public void Stop()
@@ -91,116 +108,62 @@ public void Stop()
 * "Rotate"
 * "Drop"
 
+### :pushpin:Запрос NextFigure
+
 ```C# 
-public async Task HandleResponseAsync()
-        {
-            try
-            {
-                while (true)
-                {
-                    var buffer = new List<byte>();
-                    var bytesRead = new byte[1];
+CurrentBlock.BlockID = GetRandomBlock
+```
 
-                    while (true)
-                    {
+Сервер устанавливает текущему блоку в поле **BlockID** значение ID случайного блока из списка существующих и передает это клиенту
 
-                        var nextByte = await clientSocket.ReceiveAsync(bytesRead, SocketFlags.None);
+### :pushpin:Запрос GetGrid
 
-                        if (nextByte == 0 || bytesRead[0] == '\n') break;
+**На вход из запроса сервер получает параметры поля (int rows, int cols)**.
+**На выход – обновленный счет (в зависимости от кол-ва строк) (string score), поле (int rows, int cols)**.
 
-                        buffer.Add(bytesRead[0]);
+Если срабатывает функция **GameOver** из менеджера игры, **GetGrid** посылает клиенту сообщение об окончании игры. Иначе **GetGrid** проверяет игровое поле на наличие полностью заполненных строк и очищает их, вместе с этим добавляя к счету очки за заполнение. 
 
-                    }
+### :pushpin:Запрос GetBlock
 
-                    var response = Encoding.UTF8.GetString(buffer.ToArray());
+**На выход: позиция текущего блока (int rows, int cols, int blockPosId)**
+Хранит информацию о местоположении текущего блока 
 
-                    switch (response.Split(' ')[0])
-                    {
-                        case "StartGame":
-                            var fieldSize = response.Split(' ')[1];
-                            switch (fieldSize)
-                            {
-                                case "s":
-                                    gameManager = new GameManager(server.FieldSizes[FieldSize.SMALL].Rows, server.FieldSizes[FieldSize.SMALL].Columns);
-                                    break;
-                                case "m":
-                                    gameManager = new GameManager(server.FieldSizes[FieldSize.MEDIUM].Rows, server.FieldSizes[FieldSize.MEDIUM].Columns);
-                                    break;
-                                case "l":
-                                    gameManager = new GameManager(server.FieldSizes[FieldSize.LARGE].Rows, server.FieldSizes[FieldSize.LARGE].Columns);
-                                    break;
-                            }
-                            await SendResponseAsync($"GameStarted-{gameManager.Field.Rows}-{gameManager.Field.Columns}");
-                            Console.WriteLine("Игра началась");
-                            break;
-                        case "NextFigure":
-                            await SendResponseAsync(gameManager.CurrentBlock.BlockId.ToString());
-                            break;
-                        case "GetGrid":
-                            StringBuilder stringBuilder = new StringBuilder();
-                            if (gameManager.GameOver)
-                            {
-                                await SendResponseAsync("GameOver");
-                                break;
-                            }
+### :pushpin:Запрос Left, Right:
 
-                            for (int i = 0; i < gameManager.Field.Rows; i++)
-                            {
-                                for (int j = 0; j < gameManager.Field.Columns; j++)
-                                {
-                                    stringBuilder.Append(gameManager.Field[i, j]);
-                                    stringBuilder.Append('-');
-                                }
-                                stringBuilder.Append('n');
-                            }
-
-                            stringBuilder.Append(gameManager.Score);
-                            await SendResponseAsync(stringBuilder.ToString());
-                            break;
-                        case "GetBlock":
-                            string positions = "";
-                            foreach (var position in gameManager.CurrentBlock.BlockTilesPositions())
-                            {
-                                positions += position.Row + "-" + position.Column + "-" + position.BlockPosId + "n";
-                            }
-                            //positions += gameManager.CurrentBlock.BlockId;
-                            await SendResponseAsync(positions);
-                            break;
-                        case "Left":
-                            gameManager.MoveBlockLeft();
-                            break;
-                        case "Right":
-                            gameManager.MoveBlockRight();
-                            break;
-                        case "Rotate":
-                            gameManager.RotateBlock();
-                            break;
-                        case "Drop":
-                            gameManager.DropBlock();
-                            break;
-                    }
-                }
-
-            }
-            catch (Exception e)
-            {
-                throw new Exception(e.Message);
-            }
-        }
+```C#
+BlockPicker.GetAndUpdate();
+return block;
+new Position(StartOffset.Row, StartOffset.Column)
 
 ```
-Виды блоков
+
+**Возвращает позицию блока относительно ряда и колонны (int row, int column, int blockPosId)
+
+### :pushpin:Запрос Rotate
+
+```C#
+rotationState = (rotationState + 1) % BlockTiles.Length;
+
+```
+**возвращает rotationState (int)**
+
+### :pushpin:Запрос Drop
+
+возвращает позицию блока относительно ряда и колонны 
+**(int row, int column, int blockPosId)**
+
+
+### :pushpin:Виды блоков
 ```C# 
-   private readonly Block[] blocks = new Block[]
-        {
-            new IBlock(),
-            new JBLock(),
-            new LBlock(),
-            new OBlock(),
-            new SBlock(),
-            new TBlock(),
-            new ZBlock()
-        };
+   
+            IBlock (id=1),
+            JBLock (id=2),
+            LBlock (id=3),
+            OBlock (id=4),
+            SBlock (id=5),
+            TBlock (id=6),
+            ZBlock (id=7)
+       
 
 ```
 
