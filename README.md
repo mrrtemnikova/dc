@@ -148,7 +148,7 @@ new Position(StartOffset.Row, StartOffset.Column)
 
 ```
 
-**Возвращает позицию блока относительно ряда и колонны (int row, int column, int blockPosId)**
+**Возвращает позицию блока относительно ряда и колонны после перемещения (int row, int column, int blockPosId)**
 
 ### :pushpin:Запрос Rotate
 
@@ -160,5 +160,5 @@ rotationState = (rotationState + 1) % BlockTiles.Length;
 
 ### :pushpin:Запрос Drop
 
-Возвращает позицию блока относительно ряда и колонны 
+Возвращает позицию блока относительно ряда и колонны после "падения"
 **(int row, int column, int blockPosId)**
