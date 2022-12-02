@@ -137,7 +137,7 @@ CurrentBlock.BlockID = GetRandomBlock
 ### :pushpin:Запрос GetBlock
 
 **На выход: позиция текущего блока (int rows, int cols, int blockPosId)**
-Хранит информацию о местоположении текущего блока 
+Хранит информацию о местоположении текущего блока относительно рядов и колонн поля
 
 ### :pushpin:Запрос Left, Right:
 
@@ -156,11 +156,9 @@ new Position(StartOffset.Row, StartOffset.Column)
 rotationState = (rotationState + 1) % BlockTiles.Length;
 
 ```
-**возвращает rotationState (int)**
+**Возвращает rotationState (int)**
 
 ### :pushpin:Запрос Drop
 
-возвращает позицию блока относительно ряда и колонны 
+Возвращает позицию блока относительно ряда и колонны 
 **(int row, int column, int blockPosId)**
-
-
