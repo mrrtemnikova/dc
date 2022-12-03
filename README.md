@@ -1,6 +1,7 @@
 # Тетрис
 ### :pushpin:Запуск сервера и ожидание клиента.
         
+        
 ```C# 
         public void startServer()
         {
